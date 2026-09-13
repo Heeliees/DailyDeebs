@@ -12,6 +12,6 @@ In Settings → Pages choose GitHub Actions. The included workflow downloads the
 
 ## Data and support
 
-Game descriptions and assets belong to their respective owners. Gameplay reference: https://deadbydaylight.wiki.gg/ . The current playable catalogue excludes entries without usable icons. Support payments are optional and use NZD. Configure the verified receiving account in app/support-config.ts before enabling PayPal. USD figures are indicative Frankfurter reference-rate estimates; PayPal determines any conversion at checkout.
+Game descriptions and assets belong to their respective owners. Gameplay reference: https://deadbydaylight.wiki.gg/ . The current playable catalogue excludes entries without usable icons. Support payments are optional and use NZD. The public Stripe link is configured in app/support-config.ts. Donations from NZ$0.50 to NZ$10,000 are supported; amounts are prefilled in NZD cents and can be edited at Stripe checkout. USD figures are indicative Frankfurter reference-rate estimates; Stripe determines any conversion at checkout.
 
 Monthly catalogue changes must update app/data/catalog.json and scripts/assets.json, alongside the statistics service catalogue, so daily questions remain consistent.

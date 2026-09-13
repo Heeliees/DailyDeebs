@@ -29,21 +29,21 @@ export function SupportPanel({ inDialog = false }: { inDialog?: boolean }) {
   useEffect(() => { let active = true; void referenceRate().then(value => { if (active) setRate(value); }); return () => { active = false; }; }, []);
   const validCustom = /^(?:\d+)(?:\.\d{1,2})?$/.test(custom);
   const amount = selection === 'custom' ? (validCustom ? Number(custom) : 0) : selection;
-  const validAmount = Number.isFinite(amount) && amount >= 0.01 && amount <= 10000;
+  const validAmount = Number.isFinite(amount) && amount >= 0.50 && amount <= 10000;
   const estimate = (value: number) => rate ? `≈ US$${(value * rate.rate).toFixed(2)}` : `NZ$${value.toFixed(2)}`;
-  const ready = Boolean(SUPPORT.paypalReceiver);
-  const url = new URL('https://www.paypal.com/donate');
-  url.search = new URLSearchParams({ business: SUPPORT.paypalReceiver, currency_code: 'NZD', amount: validAmount ? amount.toFixed(2) : '', item_name: 'Buy Daily Deebs a coffee' }).toString();
+  const ready = Boolean(SUPPORT.stripePaymentLink);
+  const url = new URL(SUPPORT.stripePaymentLink);
+  if (validAmount) url.searchParams.set('prefilled_amount', String(Math.round(amount * 100)));
   return <section className={`support-card ${inDialog ? 'support-card--dialog' : ''}`}>
     {!inDialog && <><Coffee className="coffee-icon" aria-hidden="true" /><h2>Buy me a coffee</h2><p>Enjoying the trials? Help keep Daily Deebs going.</p></>}
     <div className="donation-amounts" role="group" aria-label="Choose a donation amount">
       {[1, 2, 5].map(value => <Button type="button" variant="outline" key={value} aria-pressed={selection === value} onClick={() => setSelection(value)}><strong>{estimate(value)}</strong>{rate && <span>NZ${value.toFixed(2)}</span>}</Button>)}
       <Button type="button" variant="outline" aria-pressed={selection === 'custom'} onClick={() => setSelection('custom')}>Custom amount</Button>
     </div>
-    {selection === 'custom' && <div className="custom-donation"><label htmlFor={id}>Your amount (NZD)</label><Input id={id} type="number" inputMode="decimal" min="0.01" max="10000" step="0.01" value={custom} onChange={event => setCustom(event.target.value)} placeholder="NZ$" aria-invalid={custom !== '' && !validAmount} />{custom && !validAmount && <p role="alert">Enter NZ$0.01–10,000 with up to two decimal places.</p>}</div>}
+    {selection === 'custom' && <div className="custom-donation"><label htmlFor={id}>Your amount (NZD)</label><Input id={id} type="number" inputMode="decimal" min="0.50" max="10000" step="0.01" value={custom} onChange={event => setCustom(event.target.value)} placeholder="NZ$" aria-invalid={custom !== '' && !validAmount} />{custom && !validAmount && <p role="alert">Enter NZ$0.50–10,000 with up to two decimal places.</p>}</div>}
     {validAmount && <p className="donation-total">Donation: <strong>NZ${amount.toFixed(2)}</strong>{rate && <span>{estimate(amount)}</span>}</p>}
-    <p className="donation-note">Payments are in NZD. {rate ? 'USD is an estimate; PayPal’s conversion may differ.' : 'USD estimate unavailable.'}</p>
-    {ready && validAmount ? <Button className="paypal-button" asChild><a href={url.href} target="_blank" rel="noopener noreferrer">Continue to PayPal</a></Button> : <Button className="paypal-button" disabled>{ready ? 'Enter an amount' : 'Donations open soon'}</Button>}
+    <p className="donation-note">Payments are in NZD. {rate ? 'USD is an estimate; your checkout conversion may differ.' : 'USD estimate unavailable.'}</p>
+    {ready && validAmount ? <Button className="paypal-button" asChild><a href={url.href} target="_blank" rel="noopener noreferrer">Continue to Stripe</a></Button> : <Button className="paypal-button" disabled>{ready ? 'Enter an amount' : 'Donations open soon'}</Button>}
     {rate && <p className="rate-source"><a href="https://frankfurter.dev/" target="_blank" rel="noreferrer">Reference rate</a> · {rate.date}</p>}
   </section>;
 }
