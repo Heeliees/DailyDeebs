@@ -15,3 +15,7 @@ In Settings → Pages choose GitHub Actions. The included workflow downloads the
 Game descriptions and assets belong to their respective owners. Gameplay reference: https://deadbydaylight.wiki.gg/ . The current playable catalogue excludes entries without usable icons. Support payments are optional and use NZD. The public Stripe link is configured in app/support-config.ts. Donations from NZ$0.50 to NZ$10,000 are supported; amounts are prefilled in NZD cents and can be edited at Stripe checkout. USD figures are indicative Frankfurter reference-rate estimates; Stripe determines any conversion at checkout.
 
 Monthly catalogue changes must update app/data/catalog.json and scripts/assets.json, alongside the statistics service catalogue, so daily questions remain consistent.
+
+## Daily results graph
+
+The final screen displays counts for scores 1/4 through 4/4, with 0/4 recorded in the caption. The statistics service groups completed results by score for the current New Zealand day. Empty days and unavailable statistics are displayed explicitly; no sample player counts are used.
