@@ -5,31 +5,25 @@ import { Check, ChevronRight, Copy, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
-import { ADSENSE } from "./ad-config";
+import { SupportPanel, SupportTrigger } from "./support";
+import { nextTrialAt, countdownText } from "./time";
 
 import { CATEGORIES, CATEGORY_META, dayNumber, makeQuestions, type Entry } from "./game";
 
-function AdSlot({ placement }: { placement: "banner" | "rail" }) {
-  const slot = ADSENSE.slots[placement];
-  const active = Boolean(ADSENSE.client && slot);
+export default function Home() {
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    if (!active) return;
-    try {
-      const ads = window as typeof window & { adsbygoogle?: unknown[] };
-      ads.adsbygoogle = ads.adsbygoogle || [];
-      ads.adsbygoogle.push({});
-    } catch { /* The ad network can retry on its own. */ }
-  }, [active]);
-  return (
-    <aside className={`ad-slot ad-slot--${placement}`} aria-label="Advertisement">
-      <span>Advertisement</span>
-      {active ? <ins className="adsbygoogle block h-full w-full" data-ad-client={ADSENSE.client} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true" /> : null}
-    </aside>
-  );
+    const tick = () => setNow(Date.now());
+    const interval = window.setInterval(tick, 1000);
+    document.addEventListener("visibilitychange", tick);
+    return () => { window.clearInterval(interval); document.removeEventListener("visibilitychange", tick); };
+  }, []);
+  const puzzleNumber = dayNumber(new Date(now));
+  const nextRelease = useMemo(() => nextTrialAt(now), [puzzleNumber]);
+  return <DailyTrial key={puzzleNumber} puzzleNumber={puzzleNumber} remaining={countdownText(nextRelease - now)} />;
 }
 
-export default function Home() {
-  const puzzleNumber = dayNumber();
+function DailyTrial({ puzzleNumber, remaining }: { puzzleNumber: number; remaining: string }) {
   const questions = useMemo(() => makeQuestions(puzzleNumber), [puzzleNumber]);
   const storageKey = `daily-deebs-${puzzleNumber}`;
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -134,11 +128,10 @@ export default function Home() {
     <main className="site-shell">
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Daily Deebs home"><img className="mask-logo" src="./favicon.svg" alt="" /><span>DAILY DEEBS</span></a>
-        <div className="edition">#{puzzleNumber}</div>
+        <div className="header-actions"><SupportTrigger /><div className="edition">#{puzzleNumber}</div></div>
       </header>
       <div id="top" className="page-grid">
         <div className="content-column">
-          <AdSlot placement="banner" />
           <section className="quiz-card" aria-labelledby="quiz-title">
             <div className="quiz-topline">
               <div><p className="eyebrow">Today’s trial</p><h1 id="quiz-title">Know what it does?</h1></div>
@@ -181,13 +174,13 @@ export default function Home() {
                 <Button size="lg" className="share-button" onClick={() => shareResult()}>{shareState === "copied" ? <Copy /> : <Share2 />}{shareState === "copied" ? "Copied to clipboard" : "Share result"}</Button>
                 <div className="platforms">{["Text", "Discord", "Instagram", "X", "Snapchat"].map(platform => <Button variant="outline" key={platform} onClick={() => shareResult(platform)}>{platform}</Button>)}</div><p role="status">{shareNotice}</p>
                 <div className="stats-grid">{[["Best score", stats?.best == null ? "—" : `${stats.best}/4`], ["Current streak", stats ? `${stats.streak} days` : "—"], ["Worst score", stats?.worst == null ? "—" : `${stats.worst}/4`], ["Today’s average", stats?.average == null ? "—" : `${stats.average.toFixed(2)}/4`]].map(([label,value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div><p className="stats-note">{statsError || (stats ? `${stats.players} completed trials today. Personal records follow this browser. Streak = consecutive days completed.` : "Loading player statistics…")}</p>
-                <p className="return-note">A new trial arrives at midnight NZ time.</p>
+                <div className="return-note countdown"><span>Next trial in</span><strong role="timer" aria-live="off">{remaining}</strong></div>
               </div>
             )}
           </section>
           <footer><p>Daily Deebs is an unofficial fan project and is not affiliated with Behaviour Interactive.</p><p>Catalogue snapshot: September 2026 · Gameplay reference: <a href="https://deadbydaylight.wiki.gg/" target="_blank" rel="noreferrer">Official Dead by Daylight Wiki</a>.</p></footer>
         </div>
-        <div className="rail-column"><AdSlot placement="rail" /></div>
+        <aside className="rail-column" aria-label="Support Daily Deebs"><SupportPanel /></aside>
       </div>
     </main>
   );

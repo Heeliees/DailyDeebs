@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
-import { ADSENSE } from "./ad-config";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{ADSENSE.client ? <Script async strategy="afterInteractive" crossOrigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE.client}`} /> : null}{children}</body></html>;
+  return <html lang="en"><body>{children}</body></html>;
 }

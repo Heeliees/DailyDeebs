@@ -18,8 +18,8 @@ function nzDateString(date = new Date()) {
   return `${value.year}-${value.month}-${value.day}`;
 }
 
-export function dayNumber() {
-  const [year, month, day] = nzDateString().split("-").map(Number);
+export function dayNumber(date = new Date()) {
+  const [year, month, day] = nzDateString(date).split("-").map(Number);
   const [launchYear, launchMonth, launchDay] = LAUNCH_DATE.split("-").map(Number);
   return Math.max(1, Math.floor((Date.UTC(year, month - 1, day) - Date.UTC(launchYear, launchMonth - 1, launchDay)) / 86_400_000) + 1);
 }

@@ -10,8 +10,8 @@ Use Node 22 and pnpm 11.25.0. Run `pnpm install --frozen-lockfile`, `node script
 
 In Settings → Pages choose GitHub Actions. The included workflow downloads the versioned image/font catalogue, verifies SHA-256 checksums, builds the frontend, and publishes it. Assets are served by GitHub Pages after deployment. The existing Daily Deebs service supplies the build assets and shared statistics API; keep that service live.
 
-## Data and ads
+## Data and support
 
-Game descriptions and assets belong to their respective owners. Gameplay reference: https://deadbydaylight.wiki.gg/ . The current playable catalogue excludes entries without usable icons. Ads are disabled until valid AdSense publisher and slot IDs are configured and Google approves the site.
+Game descriptions and assets belong to their respective owners. Gameplay reference: https://deadbydaylight.wiki.gg/ . The current playable catalogue excludes entries without usable icons. Support payments are optional and use NZD. Configure the verified receiving account in app/support-config.ts before enabling PayPal. USD figures are indicative Frankfurter reference-rate estimates; PayPal determines any conversion at checkout.
 
 Monthly catalogue changes must update app/data/catalog.json and scripts/assets.json, alongside the statistics service catalogue, so daily questions remain consistent.
