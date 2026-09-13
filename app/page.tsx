@@ -5,6 +5,7 @@ import { Check, ChevronRight, Copy, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
+import { ScoreDistribution } from "./score-distribution";
 import { SupportPanel, SupportTrigger } from "./support";
 import { nextTrialAt, countdownText } from "./time";
 
@@ -34,7 +35,7 @@ function DailyTrial({ puzzleNumber, remaining }: { puzzleNumber: number; remaini
   const answered = answers[questionIndex] !== null;
   const complete = answers.every((answer) => answer !== null);
   const [showResults, setShowResults] = useState(false);
-  const [stats, setStats] = useState<{best:number|null;worst:number|null;streak:number;average:number|null;players:number}|null>(null);
+  const [stats, setStats] = useState<{best:number|null;worst:number|null;streak:number;average:number|null;players:number;distribution?:number[]}|null>(null);
   const [statsError, setStatsError] = useState("");
   const [shareNotice, setShareNotice] = useState("");
   const [picks, setPicks] = useState<string[]>([]);
@@ -174,6 +175,7 @@ function DailyTrial({ puzzleNumber, remaining }: { puzzleNumber: number; remaini
                 <Button size="lg" className="share-button" onClick={() => shareResult()}>{shareState === "copied" ? <Copy /> : <Share2 />}{shareState === "copied" ? "Copied to clipboard" : "Share result"}</Button>
                 <div className="platforms">{["Text", "Discord", "Instagram", "X", "Snapchat"].map(platform => <Button variant="outline" key={platform} onClick={() => shareResult(platform)}>{platform}</Button>)}</div><p role="status">{shareNotice}</p>
                 <div className="stats-grid">{[["Best score", stats?.best == null ? "—" : `${stats.best}/4`], ["Current streak", stats ? `${stats.streak} days` : "—"], ["Worst score", stats?.worst == null ? "—" : `${stats.worst}/4`], ["Today’s average", stats?.average == null ? "—" : `${stats.average.toFixed(2)}/4`]].map(([label,value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div><p className="stats-note">{statsError || (stats ? `${stats.players} completed trials today. Personal records follow this browser. Streak = consecutive days completed.` : "Loading player statistics…")}</p>
+                <ScoreDistribution distribution={stats?.distribution} error={statsError} />
                 <div className="return-note countdown"><span>Next trial in</span><strong role="timer" aria-live="off">{remaining}</strong></div>
               </div>
             )}

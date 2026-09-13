@@ -17,11 +17,15 @@ async function handle(request: Request) {
   await db.prepare('INSERT INTO results(player,day,score) VALUES(?,?,?) ON CONFLICT(player,day) DO NOTHING').bind(player,today,score).run();
  }
  const rows=await db.prepare('SELECT day,score FROM results WHERE player=? ORDER BY day DESC').bind(player).all<{day:number;score:number}>();
- const daily=await db.prepare('SELECT AVG(score) AS average,COUNT(*) AS players FROM results WHERE day=?').bind(today).first<{average:number|null;players:number}>();
+ const grouped=await db.prepare('SELECT score,COUNT(*) AS players FROM results WHERE day=? GROUP BY score').bind(today).all<{score:number;players:number}>();
+ const distribution=[0,0,0,0,0];
+ for(const row of grouped.results){if(Number.isInteger(row.score) && row.score>=0 && row.score<=4)distribution[row.score]=Number(row.players);}
+ const players=distribution.reduce((sum,count)=>sum+count,0);
+ const average=players ? distribution.reduce((sum,count,score)=>sum+score*count,0)/players : null;
  let streak=0;let expected=rows.results[0]?.day===today ? today : today-1;
  for(const row of rows.results){if(row.day!==expected)break;streak++;expected--;}
  const scores=rows.results.map(r=>r.score);
- return Response.json({best:scores.length?Math.max(...scores):null,worst:scores.length?Math.min(...scores):null,streak,average:daily?.average??null,players:daily?.players??0},{headers:{'Access-Control-Allow-Origin':request.headers.get('origin') === 'https://heeliees.github.io'?'https://heeliees.github.io':new URL(request.url).origin,'Vary':'Origin','Cache-Control':'no-store','Set-Cookie':`deebs_player=${player}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`}});
+ return Response.json({best:scores.length?Math.max(...scores):null,worst:scores.length?Math.min(...scores):null,streak,average,players,distribution},{headers:{'Access-Control-Allow-Origin':request.headers.get('origin') === 'https://heeliees.github.io'?'https://heeliees.github.io':new URL(request.url).origin,'Vary':'Origin','Cache-Control':'no-store','Set-Cookie':`deebs_player=${player}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`}});
  }catch(error){console.error(error);return Response.json({error:'Statistics unavailable'},{status:503});}
 }
 export const GET=handle;export const POST=handle;
