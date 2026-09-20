@@ -26,6 +26,7 @@ jobs:
           node-version: 22
       - run: pnpm install --frozen-lockfile
       - run: node scripts/restore-assets.mjs
+      - run: node scripts/check-game.mjs
       - run: pnpm exec vite build --config vite.pages.config.ts
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

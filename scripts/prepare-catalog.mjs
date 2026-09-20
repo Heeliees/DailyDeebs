@@ -1,3 +1,4 @@
+import { cleanDescription } from "./description.mjs";
 import { execFileSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { basename, extname, join, relative } from "node:path";
@@ -30,46 +31,6 @@ const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((entry) 
   const path = join(dir, entry.name);
   return entry.isDirectory() ? walk(path) : [path];
 });
-
-const decodeEntities = (text) => text
-  .replace(/&nbsp;/gi, " ")
-  .replace(/&amp;/gi, "&")
-  .replace(/&quot;/gi, '"')
-  .replace(/&#39;|&apos;/gi, "'")
-  .replace(/&lt;/gi, "<")
-  .replace(/&gt;/gi, ">");
-
-function resolveTunables(text, record) {
-  const tunables = record.tunables;
-  if (!tunables) return text;
-  let resolved = text.replace(/\{Tunable\.[^.}]+\.([^}]+)\}/gi, (match, key) => {
-    const values = tunables[String(key).toLowerCase()];
-    if (!Array.isArray(values) || values.length === 0) return match;
-    return String(values.at(-1));
-  });
-  if (Array.isArray(tunables)) {
-    resolved = resolved.replace(/\{(\d+)\}/g, (match, index) => {
-      const values = tunables[Number(index)];
-      return Array.isArray(values) && values.length ? String(values.at(-1)) : match;
-    });
-  }
-  return resolved;
-}
-
-function cleanDescription(raw, record) {
-  let text = resolveTunables(raw || "", record)
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/li>/gi, "\n")
-    .replace(/<li[^>]*>/gi, "• ")
-    .replace(/<[^>]+>/g, "")
-    .replace(/\{[^}]+\}/g, "")
-    .replace(/[ \t]+\n/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .replace(/[ \t]{2,}/g, " ")
-    .trim();
-  text = decodeEntities(text);
-  return text || "No gameplay description is currently available.";
-}
 
 function imageHints(key, record) {
   const rawImage = basename(record.image || "", extname(record.image || ""));
@@ -127,6 +88,7 @@ for (const [category, source] of Object.entries(sources)) {
         category,
         name: record.name,
         description: cleanDescription(record.description, record),
+        ...(category === "perk" ? { tier: 3 } : {}),
         role: record.role || "general",
         rarity: record.rarity || null,
         itemType: record.item_type || null,

@@ -1,0 +1,1 @@
+ALTER TABLE `results` ADD `mode` text DEFAULT 'easy' NOT NULL;

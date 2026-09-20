@@ -1,6 +1,7 @@
+import { gameplayEffects } from "./effects";
 import catalogData from "./data/catalog.json";
 export type Category = "perk" | "item" | "addon" | "offering";
-export type Entry = { id: string; key: string; category: Category; name: string; description: string; role: string; rarity: string | null; itemType: string | null; retired: boolean; icon: string | null };
+export type Entry = { id: string; key: string; category: Category; name: string; description: string; role: string; rarity: string | null; itemType: string | null; retired: boolean; tier?: number; icon: string | null };
 export type Question = { category: Category; answer: Entry; options: Entry[] };
 
 export const CATEGORY_META: Record<Category, { label: string; prompt: string }> = {
@@ -47,9 +48,17 @@ export function makeQuestions(number: number): Question[] {
     const activePool = fullPool.filter((entry) => !entry.retired);
     const pool = activePool.length >= 4 ? activePool : fullPool;
     const answer = pool[((number - 1) * 7 + hash(category) + categoryIndex * 19) % pool.length];
-    const peers = pool.filter((entry) => entry.id !== answer.id && entry.description !== answer.description && ((category === "perk" || category === "addon") ? entry.role === answer.role : true));
-    const distractors = seededShuffle(peers, hash(`${category}-${number}-options`)).slice(0, 3);
+    const signature = (entry: Entry) => gameplayEffects(entry).toLowerCase().replace(/\s+/g, " ").trim();
+    const answerSignature = signature(answer);
+    const peers = pool.filter((entry) => entry.id !== answer.id && signature(entry) !== answerSignature && ((category === "perk" || category === "addon") ? entry.role === answer.role : true));
+    const seen = new Set([answerSignature]);
+    const distractors = seededShuffle(peers, hash(`${category}-${number}-options`)).filter(entry => { const value = signature(entry); if (seen.has(value)) return false; seen.add(value); return true; }).slice(0, 3);
     return { category, answer, options: seededShuffle([answer, ...distractors], hash(`${category}-${number}-order`)) };
   });
 }
 
+
+// Accept a legitimate same-category choice from a pre-update browser as well.
+export function isCategoryChoice(id: string, category: Category) {
+  return (catalogData[category] as Entry[]).some(entry => entry.id === id && entry.icon);
+}

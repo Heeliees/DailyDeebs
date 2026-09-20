@@ -1,21 +1,18 @@
-type Props = { distribution?: number[]; error?: string };
-
-export function ScoreDistribution({ distribution, error }: Props) {
-  const available = Array.isArray(distribution) && distribution.length === 5 && distribution.every(count => Number.isInteger(count) && count >= 0);
-  if (!available) return <section aria-label="Today's score distribution" style={{ width: '100%', marginTop: 24 }}><h3>Today’s scores</h3><p className="stats-note">{error ? 'Score distribution is temporarily unavailable.' : 'Loading today’s score distribution…'}</p></section>;
-  const maximum = Math.max(1, ...distribution.slice(1));
-  const total = distribution.reduce((sum, count) => sum + count, 0);
-  const format = (value: number) => value.toLocaleString();
-  return <figure style={{ width: '100%', margin: '24px 0 0', padding: '20px 16px', background: '#121c23', border: '1px solid #414d55', borderRadius: 8, textAlign: 'left' }}>
-    <figcaption style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: 6 }}>Today’s scores</figcaption>
-    <p style={{ fontSize: '.875rem', color: '#b9c0c4', margin: '0 0 18px' }}>Number of players</p>
-    <div role="list" aria-label="Players by score" style={{ display: 'grid', gap: 14 }}>
-      {[1, 2, 3, 4].map(score => <div role="listitem" aria-label={`${score} out of 4: ${format(distribution[score])} players`} key={score} style={{ display: 'grid', gridTemplateColumns: '34px minmax(0, 1fr) max-content', alignItems: 'center', gap: 12 }}>
-        <span aria-hidden="true" style={{ fontSize: '1rem' }}>{score}/4</span>
-        <div aria-hidden="true" style={{ height: 28, background: '#26323b', borderRadius: 3, overflow: 'hidden' }}><div style={{ height: '100%', width: `${distribution[score] / maximum * 100}%`, background: '#d9ba7f', borderRadius: 3 }} /></div>
-        <strong aria-hidden="true" style={{ minWidth: '2ch', textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: '#f0dbb5' }}>{format(distribution[score])}</strong>
-      </div>)}
+export type DailySummary = { distribution: number[]; average: number | null; players: number };
+type Props = { combined?: DailySummary; easy?: DailySummary; hard?: DailySummary; error?: string };
+export function ScoreDistribution({ combined, easy, hard, error }: Props) {
+  if(error || !combined || !easy || !hard) return <section className="daily-chart"><h3>Today’s scores</h3><p>{error ? 'Score statistics are temporarily unavailable. Your result is saved in this browser.' : 'Loading today’s scores…'}</p></section>;
+  const groups=[{key:'easy',label:'Easy',stats:easy},{key:'hard',label:'Hard',stats:hard},{key:'combined',label:'Combined',stats:combined}];
+  const maximum=Math.max(1,...groups.flatMap(g=>g.stats.distribution));
+  return <section className="daily-chart" aria-label="Today's score distribution">
+    <h3>Today’s scores</h3>
+    <div className="mode-averages">{groups.map(g=><div key={g.key}><strong>{g.stats.average===null?'—':`${g.stats.average.toFixed(2)}/4`}</strong><span>{g.label} average</span><small>{g.stats.players.toLocaleString()} players</small></div>)}</div>
+    <div className="chart-legend">{groups.map(g=><span key={g.key}><i className={g.key}/>{g.label}</span>)}</div>
+    <p className="chart-axis">Number of players · shared scale: 0–{maximum}</p>
+    <div className="grouped-chart" role="img" aria-label="Daily player counts by score for Easy, Hard and Combined. Exact counts are in the table below.">
+      {[0,1,2,3,4].map(score=><div className="score-group" key={score}><div className="score-bars">{groups.map(g=><span key={g.key} className={g.key} style={{height:`${g.stats.distribution[score]/maximum*100}%`}} title={`${g.label}: ${g.stats.distribution[score]} players scored ${score}/4`}/>)}</div><span>{score}/4</span></div>)}
     </div>
-    <p style={{ margin: '18px 0 0', color: '#b9c0c4', fontSize: '.875rem', lineHeight: 1.5 }}>{total === 0 ? 'No completed trials recorded today yet.' : `${format(total)} completed trials today. ${format(distribution[0])} ${distribution[0] === 1 ? 'player scored' : 'players scored'} 0/4 (not shown).`}</p>
-  </figure>;
+    {combined.players===0&&<p>No completed trials yet today.</p>}
+    <details className="score-counts"><summary>View exact counts</summary><table><caption>Players by score today</caption><thead><tr><th scope="col">Score</th>{groups.map(g=><th scope="col" key={g.key}>{g.label}</th>)}</tr></thead><tbody>{[0,1,2,3,4].map(score=><tr key={score}><th scope="row">{score}/4</th>{groups.map(g=><td key={g.key}>{g.stats.distribution[score]}</td>)}</tr>)}</tbody></table></details>
+  </section>;
 }

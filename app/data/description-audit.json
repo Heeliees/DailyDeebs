@@ -1,0 +1,14 @@
+{
+  "repairedAt": "2026-09-20",
+  "snapshot": "2026-09-12",
+  "scope": "Restore terms removed by the importer; preserve existing catalogue identities and daily selection. Not a full live-wiki revalidation.",
+  "perkTier": 3,
+  "resolvedPerkSnapshot": "https://github.com/andre-paulo98/dbd-perks-overlay/blob/d38c1d91d621f97d668bf38ae0492b444511ef34/server/server/public/perks/perks-cache.json",
+  "resolverReference": "https://github.com/andre-paulo98/dbd-perks-overlay/blob/d38c1d91d621f97d668bf38ae0492b444511ef34/server/server/src/perksCatalog.js",
+  "manualRepairs": {
+    "Tinkerer": "User wiki screenshot: 70% generator progress, loud-noise location notification, Undetectable 16s, once per generator per trial.",
+    "K32P03": "Restore Haste and Undetectable; retain 8% and 60s.",
+    "Rancor": "Restore Exposed."
+  },
+  "refreshRule": "Resolve all Keyword/Input/Tunable references before stripping HTML. Stop on unresolved references. Review effect extraction and grading tests. Deploy identical catalogues to frontend and statistics service."
+}
