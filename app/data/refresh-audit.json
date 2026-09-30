@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-10-01",
+  "sources": [
+    "https://dbd.tricky.lol/api/perks",
+    "https://dbd.tricky.lol/api/items",
+    "https://dbd.tricky.lol/api/addons",
+    "https://dbd.tricky.lol/api/offerings",
+    "https://deadbydaylight.wiki.gg/wiki/Patch_10.1.0",
+    "https://deadbydaylight.wiki.gg/wiki/Made_for_This",
+    "https://deadbydaylight.wiki.gg/wiki/Bone_Clapper"
+  ],
+  "changedPerks": [
+    "S33P01",
+    "S28P02",
+    "S30P03",
+    "S29P03",
+    "Deathbound",
+    "S52P01",
+    "K26P03",
+    "K25P02",
+    "S37P02",
+    "No_One_Left_Behind",
+    "K30P01",
+    "RepressedAlliance",
+    "K42P02",
+    "Thanatophobia",
+    "TrailofTorment",
+    "Vigil"
+  ],
+  "perkTier": 3,
+  "scope": "Compared all four live API catalogues; targeted wiki verification of changed mechanics, not every entry or icon. No new usable entries. Preserved seven existing items absent from live API and skipped five source records without descriptions. Preserved explicit Tinkerer notification wording. Item, add-on and offering descriptions unchanged.",
+  "iconRepair": "Bone Clapper: replaced zero-byte icon from Zawgalicious/DBDImages; identity cross-checked against the Official Wiki.",
+  "preserved": [
+    "2026-09-12 day-one anchor",
+    "catalogue order and identity",
+    "no-near-term-repeat selection",
+    "Easy and Hard modes",
+    "one browser result daily",
+    "legacy Easy results",
+    "Easy/Hard/Combined graphs"
+  ],
+  "iconSourceCommit": "931465172edf01c5277f0ffbc3e32f0ddeadecad"
+}

@@ -3,6 +3,8 @@ import { gameplayEffects } from './effects';
 
 export type Grade = { correct: boolean; missing: string[] };
 const aliases: [RegExp, string][] = [
+  [/\b(?:recover(?:ing)? from|lose|loses|losing)\b/g, 'recover'],
+  [/\b(?:sprint(?:ing)?|run(?:ning)?)\b/g, 'running'],
   [/\b(?:gens?|generators?)\b/g, 'generator'], [/\b(?:survs?|survivors?|teammates?|team mates?|allies)\b/g, 'survivor'],
   [/\b(?:heals?|healing|healed)\b/g, 'heal'], [/\b(?:repairs?|repairing|repaired|fix(?:es|ing|ed)?)\b/g, 'repair'],
   [/\b(?:sabotag\w*|sabo)\b/g, 'sabotage'], [/\b(?:auras?|outlines?)\b/g, 'aura'],

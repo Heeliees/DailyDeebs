@@ -30,6 +30,11 @@ try {
  check('Bloody Party Streamers','25% bonus BP in all categories for everyone',false);
  check('"Windstorm" - Blood','Increases cloaked movement speed by 9%',true);
  check('"Windstorm" - Blood','Increases cloaked movement speed by 5%',false);
+ check('Vigil','Survivors within 16m recover from exhaustion 30% faster. Lingers for 15 seconds after leaving your range.',true);
+ check('Vigil','Survivors within 16m recover from exhaustion 40% faster. Lingers for 15 seconds after leaving your range.',false);
+ check('Nowhere to Hide','After damaging a generator, see survivor auras within 24m of that generator for 5 seconds.',true);
+ check('Repressed\u00a0Alliance\u00a0','After repairing generators for 30 seconds, while repairing a generator alone, use the ability button to block it for 15 seconds.',true);
+ check('Made for This','While injured, finish healing another survivor to gain Endurance for 10s. While sprinting with Deep Wound gain 3% Haste.',true);
  for(const e of entries) {
   const effects=gameplayEffects(e);assert.ok(effects.length>5,`Empty effects: ${e.name}`);
   assert.equal(gradeAnswer(e,effects).correct,true,`Canonical effects rejected: ${e.name}`);
@@ -42,6 +47,9 @@ try {
  assert.equal(cleanDescription('{0}',{name:'legacy',tunables:[['12','14','16']]}),'16');
  assert.throws(()=>cleanDescription('Gain {Tunable.X.Unknown}',fixture),/Unresolved/);
  assert.equal(dayNumber(new Date('2026-09-11T12:00:00Z')),1);
+ assert.equal(dayNumber(new Date('2026-09-30T20:55:00Z')),20);
+ const yearQuestions=Array.from({length:372},(_,i)=>makeQuestions(i+1));
+ for(let day=0;day<365;day++)for(let gap=1;gap<7;gap++)for(let category=0;category<4;category++)assert.notEqual(yearQuestions[day][category].answer.id,yearQuestions[day+gap][category].answer.id,'Near-term repeat');
  assert.equal(makeQuestions(9)[0].answer.name,'Tinkerer');
  for(let day=1;day<=30;day++) for(const question of makeQuestions(day)){assert.equal(question.options.length,4);assert.equal(new Set(question.options.map(gameplayEffects).map(s=>s.toLowerCase().replace(/\s+/g,' ').trim())).size,4);}
  console.log(`Passed grading regressions, Tier III/import checks, daily anchor, and ${entries.length} playable effect descriptions.`);
